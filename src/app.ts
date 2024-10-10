@@ -24,7 +24,7 @@ app.use(
 app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Welcome to Car Rental Reservation System");
+  res.send("Welcome to Tech & Tips Hub");
 });
 
 app.use(globalErrorHandler);
