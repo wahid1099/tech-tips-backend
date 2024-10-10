@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-// import router from "./app/routes";
+import router from "./app/routes";
 import globalErrorHandler from "./app/middleware/globalErrorHandler";
 import notFound from "./app/middleware/notFound";
 import cookieParser from "cookie-parser";
@@ -15,13 +15,13 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://car-rental-backend-assingment.vercel.app",
-      "https://car-rental-bd-frontend-c8rk.vercel.app",
+      "https://tech-tips-backend.vercel.app",
     ],
     credentials: true,
   })
 );
 //application routes
-// app.use("/api", router);
+app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to Car Rental Reservation System");
