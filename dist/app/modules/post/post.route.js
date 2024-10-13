@@ -11,7 +11,7 @@ const user_constant_1 = require("../user/user.constant");
 const post_controller_1 = require("./post.controller");
 const validateRequest_1 = __importDefault(require("../../middleware/validateRequest"));
 const router = express_1.default.Router();
-router.post("/", (0, auth_1.default)(user_constant_1.USER_ROLE.user), (0, validateRequest_1.default)(post_validation_1.PostValidation.createPostValidation), post_controller_1.PostControllers.createPostFromDB);
+router.post("/create-post", (0, auth_1.default)(user_constant_1.USER_ROLE.user), (0, validateRequest_1.default)(post_validation_1.PostValidation.createPostValidation), post_controller_1.PostControllers.createPostFromDB);
 router.get("/", post_controller_1.PostControllers.getAllPostsFromDB);
 router.get("/my-posts", (0, auth_1.default)(user_constant_1.USER_ROLE.user, user_constant_1.USER_ROLE.admin), post_controller_1.PostControllers.myPosts);
 router.get("/:postId", 

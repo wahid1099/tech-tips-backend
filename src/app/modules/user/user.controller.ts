@@ -8,7 +8,7 @@ const createUserFromDB = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Users Retrieved Successfully",
+    message: "Users Created Successfully",
     data: result,
   });
 });

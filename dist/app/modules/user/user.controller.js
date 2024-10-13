@@ -22,7 +22,7 @@ const createUserFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
-        message: "Users Retrieved Successfully",
+        message: "Users Created Successfully",
         data: result,
     });
 }));

@@ -10,7 +10,7 @@ import validateRequest from "../../middleware/validateRequest";
 const router = express.Router();
 
 router.post(
-  "/",
+  "/create-post",
   auth(USER_ROLE.user),
   validateRequest(PostValidation.createPostValidation),
   PostControllers.createPostFromDB
