@@ -126,7 +126,7 @@ const commentsUpdateIntoDB = async (
 };
 const votePostIntoDB = async (
   postId: string,
-  action: "upvote" | "downvote"
+  action: "upvote" | "downvote" | "removeUpvote" | "removeDownvote"
 ) => {
   const post = await Post.findById(postId);
   if (!post) {
@@ -139,6 +139,10 @@ const votePostIntoDB = async (
     post.upvotes += 1;
   } else if (action === "downvote") {
     post.downVotes += 1;
+  } else if (action === "removeUpvote") {
+    post.upvotes -= 1;
+  } else if (action === "removeDownvote") {
+    post.downVotes -= 1;
   }
   const updatedPost = await post.save();
   return updatedPost;

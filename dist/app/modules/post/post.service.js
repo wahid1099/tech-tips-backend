@@ -125,6 +125,12 @@ const votePostIntoDB = (postId, action) => __awaiter(void 0, void 0, void 0, fun
     else if (action === "downvote") {
         post.downVotes += 1;
     }
+    else if (action === "removeUpvote") {
+        post.upvotes -= 1;
+    }
+    else if (action === "removeDownvote") {
+        post.downVotes -= 1;
+    }
     const updatedPost = yield post.save();
     return updatedPost;
 });
