@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 
 const commentSchema = new Schema(
   {
@@ -62,14 +62,20 @@ const postSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    upvotes: {
-      type: Number,
-      default: 0,
-    },
-    downVotes: {
-      type: Number,
-      default: 0,
-    },
+    upVotes: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
+    downVotes: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
     comments: [commentSchema],
     images: {
       type: [String],
@@ -85,6 +91,10 @@ const postSchema = new Schema(
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    thumbnailImage: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }

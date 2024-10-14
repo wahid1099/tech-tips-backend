@@ -31,8 +31,10 @@ export interface TPost {
     | "Others";
   tags?: string[];
   isPremium: boolean;
-  upvotes: number;
-  downVotes: number;
+  upVotes: Types.ObjectId[];
+
+  downVotes: Types.ObjectId[];
+
   comments: TComment[];
   images?: string[];
   status: "Draft" | "Published";

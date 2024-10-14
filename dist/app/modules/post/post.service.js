@@ -17,6 +17,7 @@ const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../../error/AppError"));
 const post_models_1 = __importDefault(require("./post.models"));
 const user_model_1 = require("../user/user.model");
+const mongoose_1 = require("mongoose");
 const getAllPostsFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
     const posts = yield post_models_1.default.find()
         .populate("author")
@@ -111,7 +112,7 @@ const commentsUpdateIntoDB = (postId, commentId, newCommment) => __awaiter(void 
     const updatedPost = yield post.save();
     return updatedPost;
 });
-const votePostIntoDB = (postId, action) => __awaiter(void 0, void 0, void 0, function* () {
+const votePostIntoDB = (userId, postId, action) => __awaiter(void 0, void 0, void 0, function* () {
     const post = yield post_models_1.default.findById(postId);
     if (!post) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Post not found");
@@ -119,17 +120,17 @@ const votePostIntoDB = (postId, action) => __awaiter(void 0, void 0, void 0, fun
     if (post.isDeleted) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Post already deleted");
     }
+    const upVotesArray = Array.isArray(post.upVotes) ? post.upVotes : [];
+    const downVotesArray = Array.isArray(post.downVotes) ? post.downVotes : [];
+    // Remove user from both upVotes and downVotes arrays before adding new vote
+    post.upVotes = upVotesArray.filter((id) => id.toString() !== userId);
+    post.downVotes = downVotesArray.filter((id) => id.toString() !== userId);
+    // Apply the appropriate action
     if (action === "upvote") {
-        post.upvotes += 1;
+        post.upVotes.push(new mongoose_1.Types.ObjectId(userId));
     }
     else if (action === "downvote") {
-        post.downVotes += 1;
-    }
-    else if (action === "removeUpvote") {
-        post.upvotes -= 1;
-    }
-    else if (action === "removeDownvote") {
-        post.downVotes -= 1;
+        post.downVotes.push(new mongoose_1.Types.ObjectId(userId));
     }
     const updatedPost = yield post.save();
     return updatedPost;

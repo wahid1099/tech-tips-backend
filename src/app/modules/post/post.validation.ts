@@ -33,10 +33,12 @@ const createPostValidation = z.object({
     ]),
     tags: z.array(z.string()).optional(),
     isPremium: z.boolean().default(false),
+    thumbnailImage: z.string().url("Invalid thumbnail URL").optional(),
+
     upVotes: z.number().int().nonnegative().default(0),
     downVotes: z.number().int().nonnegative().default(0),
     comments: z.array(commentValidationSchema).optional(),
-    images: z.array(z.string().url("Invalid image URL")).optional(),
+
     status: z.enum(["Draft", "Published"]).default("Draft"),
     pdfVersion: z.string().url("Invalid PDF URL").optional(),
     isDeleted: z.boolean().default(false),
@@ -46,13 +48,32 @@ const createPostValidation = z.object({
 const updatePostValidation = z.object({
   body: z.object({
     title: z.string().min(1, "Title is required").trim().optional(),
-    content: z.string().min(1, "Content is required").optional(),
+    description: z.string().min(1, "description is required").optional(),
     category: z
-      .enum(["Web", "Software Engineering", "AI", "ML", "VR", "Others"])
+      .enum([
+        "Web",
+        "Android",
+        "Software Engineering",
+        "VR",
+        "Mobile",
+        "Macbook",
+        "Gaming",
+        "Artificial Intelligence",
+        "Blockchain",
+        "Cybersecurity",
+        "Data Science",
+        "Machine Learning",
+        "Natural Language Processing",
+        "Cloud Computing",
+        "Quantum Computing",
+        "Quantum Cryptography",
+        "Artificial General Intelligence",
+        "Others",
+      ])
       .optional(),
     tags: z.array(z.string()).optional(),
     isPremium: z.boolean().default(false).optional(),
-    images: z.array(z.string().url("Invalid image URL")).optional(),
+    thumbnailImage: z.string().url("Invalid thumbnail URL").optional(),
   }),
 });
 

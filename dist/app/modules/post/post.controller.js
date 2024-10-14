@@ -99,10 +99,11 @@ const updateCommentFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(vo
 const votePost = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { postId } = req.params;
     const { action } = req.body;
+    const userId = req.user.userId;
     if (!["upvote", "downvote"].includes(action)) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Invalid action");
     }
-    const result = yield post_service_1.PostServices.votePostIntoDB(postId, action);
+    const result = yield post_service_1.PostServices.votePostIntoDB(userId, postId, action);
     (0, sendResponse_1.default)(res, {
         success: true,
         message: "Post voted successfully",

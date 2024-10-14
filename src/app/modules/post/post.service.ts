@@ -3,6 +3,7 @@ import AppError from "../../error/AppError";
 import { TComment, TPost } from "./post.interface";
 import Post from "./post.models";
 import { User } from "../user/user.model";
+import { Types } from "mongoose";
 
 const getAllPostsFromDB = async () => {
   const posts = await Post.find()
@@ -125,28 +126,40 @@ const commentsUpdateIntoDB = async (
   return updatedPost;
 };
 const votePostIntoDB = async (
+  userId: string,
   postId: string,
   action: "upvote" | "downvote" | "removeUpvote" | "removeDownvote"
 ) => {
   const post = await Post.findById(postId);
+
   if (!post) {
     throw new AppError(httpStatus.BAD_REQUEST, "Post not found");
   }
+
   if (post.isDeleted) {
     throw new AppError(httpStatus.BAD_REQUEST, "Post already deleted");
   }
+
+  const upVotesArray = Array.isArray(post.upVotes) ? post.upVotes : [];
+  const downVotesArray = Array.isArray(post.downVotes) ? post.downVotes : [];
+
+  // Remove user from both upVotes and downVotes arrays before adding new vote
+  post.upVotes = upVotesArray.filter((id) => id.toString() !== userId) as any;
+  post.downVotes = downVotesArray.filter(
+    (id) => id.toString() !== userId
+  ) as any;
+
+  // Apply the appropriate action
   if (action === "upvote") {
-    post.upvotes += 1;
+    post.upVotes.push(new Types.ObjectId(userId));
   } else if (action === "downvote") {
-    post.downVotes += 1;
-  } else if (action === "removeUpvote") {
-    post.upvotes -= 1;
-  } else if (action === "removeDownvote") {
-    post.downVotes -= 1;
+    post.downVotes.push(new Types.ObjectId(userId));
   }
+
   const updatedPost = await post.save();
   return updatedPost;
 };
+
 const myPostsIntoDB = async (email: string) => {
   const user = await User.isUserExists(email);
   if (!user) {
