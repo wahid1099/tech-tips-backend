@@ -128,7 +128,7 @@ const commentsUpdateIntoDB = async (
 const votePostIntoDB = async (
   userId: string,
   postId: string,
-  action: "upvote" | "downvote" | "removeUpvote" | "removeDownvote"
+  action: "upvote" | "downvote"
 ) => {
   const post = await Post.findById(postId);
 
