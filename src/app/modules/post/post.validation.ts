@@ -33,7 +33,11 @@ const createPostValidation = z.object({
     ]),
     tags: z.array(z.string()).optional(),
     isPremium: z.boolean().default(false),
-    thumbnailImage: z.string().url("Invalid thumbnail URL").optional(),
+    thumbnailImage: z
+      .string()
+      .url("Invalid thumbnail URL")
+      .optional()
+      .nullable(),
 
     upVotes: z.number().int().nonnegative().default(0),
     downVotes: z.number().int().nonnegative().default(0),
@@ -73,7 +77,11 @@ const updatePostValidation = z.object({
       .optional(),
     tags: z.array(z.string()).optional(),
     isPremium: z.boolean().default(false).optional(),
-    thumbnailImage: z.string().url("Invalid thumbnail URL").optional(),
+    thumbnailImage: z
+      .string()
+      .url("Invalid thumbnail URL")
+      .optional()
+      .nullable(),
   }),
 });
 

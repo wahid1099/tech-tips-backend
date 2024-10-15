@@ -34,7 +34,11 @@ const createPostValidation = zod_1.z.object({
         ]),
         tags: zod_1.z.array(zod_1.z.string()).optional(),
         isPremium: zod_1.z.boolean().default(false),
-        thumbnailImage: zod_1.z.string().url("Invalid thumbnail URL").optional(),
+        thumbnailImage: zod_1.z
+            .string()
+            .url("Invalid thumbnail URL")
+            .optional()
+            .nullable(),
         upVotes: zod_1.z.number().int().nonnegative().default(0),
         downVotes: zod_1.z.number().int().nonnegative().default(0),
         comments: zod_1.z.array(commentValidationSchema).optional(),
@@ -71,7 +75,11 @@ const updatePostValidation = zod_1.z.object({
             .optional(),
         tags: zod_1.z.array(zod_1.z.string()).optional(),
         isPremium: zod_1.z.boolean().default(false).optional(),
-        thumbnailImage: zod_1.z.string().url("Invalid thumbnail URL").optional(),
+        thumbnailImage: zod_1.z
+            .string()
+            .url("Invalid thumbnail URL")
+            .optional()
+            .nullable(),
     }),
 });
 exports.PostValidation = {
