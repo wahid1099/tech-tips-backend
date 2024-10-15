@@ -77,7 +77,7 @@ const postSchema = new Schema(
       },
     ],
     comments: [commentSchema],
-   
+
     status: {
       type: String,
       enum: ["Draft", "Published"],
@@ -92,7 +92,7 @@ const postSchema = new Schema(
     },
     thumbnailImage: {
       type: String,
-      required: true,
+      required: false,
     },
   },
   { timestamps: true }

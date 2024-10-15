@@ -110,7 +110,7 @@ const postSchema = new mongoose_1.Schema({
     },
     thumbnailImage: {
         type: String,
-        required: true,
+        required: false,
     },
 }, { timestamps: true });
 postSchema.pre("find", function (next) {
