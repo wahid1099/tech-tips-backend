@@ -18,12 +18,29 @@ const AppError_1 = __importDefault(require("../../error/AppError"));
 const post_models_1 = __importDefault(require("./post.models"));
 const user_model_1 = require("../user/user.model");
 const mongoose_1 = require("mongoose");
-const getAllPostsFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
-    const posts = yield post_models_1.default.find()
+const getAllPostsFromDB = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (searchQuery = "", category = "", page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+    const query = {}; // Use the interface
+    if (searchQuery) {
+        query.title = { $regex: searchQuery, $options: "i" }; // Case-insensitive search
+    }
+    if (category) {
+        query.category = category;
+    }
+    const posts = yield post_models_1.default.find(query)
         .populate("author")
         .populate("comments.user")
-        .sort("-createdAt");
-    return posts;
+        .sort("-createdAt")
+        .skip(skip)
+        .limit(limit);
+    const totalPosts = yield post_models_1.default.countDocuments(query); // Total number of posts
+    return {
+        posts,
+        totalPosts,
+        totalPages: Math.ceil(totalPosts / limit),
+        currentPage: page,
+        hasMore: page * limit < totalPosts, // Check if there are more posts
+    };
 });
 const getSinglePostFromDB = (postId) => __awaiter(void 0, void 0, void 0, function* () {
     const post = yield post_models_1.default.findById(postId)

@@ -28,12 +28,24 @@ const createPostFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     });
 }));
 const getAllPostsFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield post_service_1.PostServices.getAllPostsFromDB();
+    const searchQuery = req.query.searchQuery
+        ? String(req.query.searchQuery)
+        : "";
+    const category = req.query.category ? String(req.query.category) : "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const result = yield post_service_1.PostServices.getAllPostsFromDB(searchQuery, category, page, limit);
     (0, sendResponse_1.default)(res, {
         success: true,
         message: "All posts fetched successfully",
         statusCode: http_status_1.default.OK,
-        data: result,
+        data: result.posts,
+        pagination: {
+            totalPosts: result.totalPosts,
+            totalPages: result.totalPages,
+            currentPage: result.currentPage,
+            hasMore: result.hasMore,
+        },
     });
 }));
 const getSinglePostFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

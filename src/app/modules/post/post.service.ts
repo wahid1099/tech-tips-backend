@@ -5,13 +5,47 @@ import Post from "./post.models";
 import { User } from "../user/user.model";
 import { Types } from "mongoose";
 
-const getAllPostsFromDB = async () => {
-  const posts = await Post.find()
+interface QueryParams {
+  title?: { $regex: string; $options: string };
+  category?: string;
+}
+
+const getAllPostsFromDB = async (
+  searchQuery = "",
+  category = "",
+  page = 1,
+  limit = 10
+) => {
+  const skip = (page - 1) * limit;
+
+  const query: QueryParams = {}; // Use the interface
+
+  if (searchQuery) {
+    query.title = { $regex: searchQuery, $options: "i" }; // Case-insensitive search
+  }
+
+  if (category) {
+    query.category = category;
+  }
+
+  const posts = await Post.find(query)
     .populate("author")
     .populate("comments.user")
-    .sort("-createdAt");
-  return posts;
+    .sort("-createdAt")
+    .skip(skip)
+    .limit(limit);
+
+  const totalPosts = await Post.countDocuments(query); // Total number of posts
+
+  return {
+    posts,
+    totalPosts,
+    totalPages: Math.ceil(totalPosts / limit),
+    currentPage: page,
+    hasMore: page * limit < totalPosts, // Check if there are more posts
+  };
 };
+
 const getSinglePostFromDB = async (postId: string) => {
   const post = await Post.findById(postId)
     .populate("author")

@@ -7,6 +7,7 @@ const sendResponse = (res, data) => {
         message: data.message,
         data: data.data,
         token: data.token,
+        pagination: data.pagination, // Include pagination if available
     });
 };
 exports.default = sendResponse;

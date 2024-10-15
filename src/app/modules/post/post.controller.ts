@@ -15,12 +15,32 @@ const createPostFromDB = catchAsync(async (req, res) => {
 });
 
 const getAllPostsFromDB = catchAsync(async (req, res) => {
-  const result = await PostServices.getAllPostsFromDB();
+  const searchQuery = req.query.searchQuery
+    ? String(req.query.searchQuery)
+    : "";
+  const category = req.query.category ? String(req.query.category) : "";
+
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+
+  const result = await PostServices.getAllPostsFromDB(
+    searchQuery,
+    category,
+    page,
+    limit
+  );
+
   sendResponse(res, {
     success: true,
     message: "All posts fetched successfully",
     statusCode: httpStatus.OK,
-    data: result,
+    data: result.posts,
+    pagination: {
+      totalPosts: result.totalPosts,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
+      hasMore: result.hasMore,
+    },
   });
 });
 
