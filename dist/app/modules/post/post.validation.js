@@ -36,7 +36,9 @@ const createPostValidation = zod_1.z.object({
         isPremium: zod_1.z.boolean().default(false),
         thumbnailImage: zod_1.z
             .string()
-            .url("Invalid thumbnail URL")
+            .refine((value) => value === "" || zod_1.z.string().url().safeParse(value).success, {
+            message: "Invalid thumbnail URL",
+        })
             .optional()
             .nullable(),
         upVotes: zod_1.z.number().int().nonnegative().default(0),
@@ -77,7 +79,9 @@ const updatePostValidation = zod_1.z.object({
         isPremium: zod_1.z.boolean().default(false).optional(),
         thumbnailImage: zod_1.z
             .string()
-            .url("Invalid thumbnail URL")
+            .refine((value) => value === "" || zod_1.z.string().url().safeParse(value).success, {
+            message: "Invalid thumbnail URL",
+        })
             .optional()
             .nullable(),
     }),

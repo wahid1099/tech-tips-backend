@@ -35,7 +35,12 @@ const createPostValidation = z.object({
     isPremium: z.boolean().default(false),
     thumbnailImage: z
       .string()
-      .url("Invalid thumbnail URL")
+      .refine(
+        (value) => value === "" || z.string().url().safeParse(value).success,
+        {
+          message: "Invalid thumbnail URL",
+        }
+      )
       .optional()
       .nullable(),
 
@@ -79,7 +84,12 @@ const updatePostValidation = z.object({
     isPremium: z.boolean().default(false).optional(),
     thumbnailImage: z
       .string()
-      .url("Invalid thumbnail URL")
+      .refine(
+        (value) => value === "" || z.string().url().safeParse(value).success,
+        {
+          message: "Invalid thumbnail URL",
+        }
+      )
       .optional()
       .nullable(),
   }),
