@@ -16,7 +16,7 @@ app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({
     origin: [
         "http://localhost:5173",
-        "https://car-rental-backend-assingment.vercel.app",
+        "https://techtipshubwahid.netlify.app",
         "https://tech-tips-backend.vercel.app",
     ],
     credentials: true,

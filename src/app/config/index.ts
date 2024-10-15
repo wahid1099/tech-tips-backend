@@ -13,4 +13,9 @@ export default {
   client_url: process.env.CLIENT_URL,
   user_email: process.env.EMAIL_USER,
   user_pass: process.env.EMAIL_PASS,
+  payment_url: process.env.PAYMENT_URL,
+  store_id: process.env.Store_ID,
+  signature_key: process.env.SIGNATURE_KEY,
+  backend_url: process.env.BACKEND_URL,
+  payment_verify_url: process.env.BACKEND_URL,
 };

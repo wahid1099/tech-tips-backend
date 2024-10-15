@@ -14,7 +14,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://car-rental-backend-assingment.vercel.app",
+      "https://techtipshubwahid.netlify.app",
       "https://tech-tips-backend.vercel.app",
     ],
     credentials: true,
