@@ -76,14 +76,15 @@ const confirmationServiceIntoDB = (transactionId, status, payloadData) => __awai
             status: res.pay_status === "Successful" ? "completed" : "failed",
             expiryDate: (0, PaymentGatway_1.calculateExpiryDate)(parsedPaymentData === null || parsedPaymentData === void 0 ? void 0 : parsedPaymentData.expiry),
         };
+        const payment = yield payment_model_1.PaymentModel.create(paymentInfo);
         if ((res === null || res === void 0 ? void 0 : res.pay_status) === "Successful") {
             yield user_model_1.User.findByIdAndUpdate({
                 _id: parsedPaymentData === null || parsedPaymentData === void 0 ? void 0 : parsedPaymentData.user,
             }, {
                 isVerified: true,
                 subscriptions: paymentInfo === null || paymentInfo === void 0 ? void 0 : paymentInfo.packageName,
+                $push: { payments: payment._id }, // Push the created payment _id to the user's payments array
             }, { new: true });
-            yield payment_model_1.PaymentModel.create(paymentInfo);
             message = "Payment successful";
             const filePath = (0, path_1.join)(__dirname, "../../../../public/confirmation.html");
             let template = (0, fs_1.readFileSync)(filePath, "utf-8");

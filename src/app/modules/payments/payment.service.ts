@@ -90,6 +90,7 @@ const confirmationServiceIntoDB = async (
       status: res.pay_status === "Successful" ? "completed" : "failed",
       expiryDate: calculateExpiryDate(parsedPaymentData?.expiry),
     };
+    const payment = await PaymentModel.create(paymentInfo);
 
     if (res?.pay_status === "Successful") {
       await User.findByIdAndUpdate(
@@ -100,11 +101,10 @@ const confirmationServiceIntoDB = async (
           isVerified: true,
 
           subscriptions: paymentInfo?.packageName,
+          $push: { payments: payment._id }, // Push the created payment _id to the user's payments array
         },
         { new: true }
       );
-
-      await PaymentModel.create(paymentInfo);
 
       message = "Payment successful";
 
