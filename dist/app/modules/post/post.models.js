@@ -96,9 +96,6 @@ const postSchema = new mongoose_1.Schema({
         },
     ],
     comments: [commentSchema],
-    images: {
-        type: [String],
-    },
     status: {
         type: String,
         enum: ["Draft", "Published"],

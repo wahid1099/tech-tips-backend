@@ -77,9 +77,7 @@ const postSchema = new Schema(
       },
     ],
     comments: [commentSchema],
-    images: {
-      type: [String],
-    },
+   
     status: {
       type: String,
       enum: ["Draft", "Published"],

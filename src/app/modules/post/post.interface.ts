@@ -36,7 +36,7 @@ export interface TPost {
   downVotes: Types.ObjectId[];
 
   comments: TComment[];
-  images?: string[];
+  thumbnailImage?: string;
   status: "Draft" | "Published";
   pdfVersion?: string;
   isDeleted: boolean;
