@@ -56,6 +56,7 @@ const confirmationServiceIntoDB = async (
 
   try {
     const res = await verifyPayment(transactionId);
+    console.log(res);
     if (!res || res.pay_status !== "Successful") {
       throw new Error("Payment verification failed or was not successful.");
     }

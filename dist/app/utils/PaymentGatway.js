@@ -17,28 +17,34 @@ const axios_1 = __importDefault(require("axios"));
 const index_1 = __importDefault(require("../config/index"));
 const initiatePayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const payloadData = encodeURIComponent(JSON.stringify(payload));
-    const response = yield axios_1.default.post(index_1.default.payment_url, {
-        store_id: index_1.default.store_id,
-        signature_key: index_1.default.signature_key,
-        tran_id: payload.transactionId,
-        success_url: `${index_1.default.backend_url}/api/v1/payment/confirmation?transactionId=${payload.transactionId}&status=success&payloadData=${payloadData}`,
-        fail_url: `${index_1.default.backend_url}/api/v1/payment/confirmation?transactionId=${payload.transactionId}&status=failed`,
-        cancel_url: `${index_1.default.client_url}`,
-        amount: payload.price,
-        currency: "BDT",
-        desc: "Merchant Registration Payment",
-        cus_name: payload === null || payload === void 0 ? void 0 : payload.userName,
-        cus_email: payload === null || payload === void 0 ? void 0 : payload.email,
-        cus_add1: payload === null || payload === void 0 ? void 0 : payload.address,
-        cus_add2: payload === null || payload === void 0 ? void 0 : payload.address,
-        cus_city: "Dhaka",
-        cus_state: "Dhaka",
-        cus_postcode: "1206",
-        cus_country: "Bangladesh",
-        cus_phone: "133555666",
-        type: "json",
-    });
-    return response.data;
+    try {
+        const response = yield axios_1.default.post(index_1.default.payment_url, {
+            store_id: index_1.default.store_id,
+            signature_key: index_1.default.signature_key,
+            tran_id: payload.transactionId,
+            success_url: `${index_1.default.backend_url}/api/v1/payment/confirmation?transactionId=${payload.transactionId}&status=success&payloadData=${payloadData}`,
+            fail_url: `${index_1.default.backend_url}/api/v1/payment/confirmation?transactionId=${payload.transactionId}&status=failed`,
+            cancel_url: `${index_1.default.client_url}`,
+            amount: payload.price,
+            currency: "BDT",
+            desc: "Merchant Registration Payment",
+            cus_name: payload === null || payload === void 0 ? void 0 : payload.userName,
+            cus_email: payload === null || payload === void 0 ? void 0 : payload.email,
+            cus_add1: payload === null || payload === void 0 ? void 0 : payload.address,
+            cus_add2: payload === null || payload === void 0 ? void 0 : payload.address,
+            cus_city: "Dhaka",
+            cus_state: "Dhaka",
+            cus_postcode: "1206",
+            cus_country: "Bangladesh",
+            cus_phone: "133555666",
+            type: "json",
+        });
+        return response.data;
+    }
+    catch (error) {
+        console.error("Error initiating payment:", error);
+        throw new Error("Payment initiation failed!");
+    }
 });
 exports.initiatePayment = initiatePayment;
 const verifyPayment = (tnxId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -54,6 +60,7 @@ const verifyPayment = (tnxId) => __awaiter(void 0, void 0, void 0, function* () 
         return response.data;
     }
     catch (err) {
+        console.error("Error verifying payment:", err.response ? err.response.data : err.message);
         throw new Error("Payment validation failed!");
     }
 });

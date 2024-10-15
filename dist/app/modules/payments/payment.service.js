@@ -46,6 +46,7 @@ const confirmationServiceIntoDB = (transactionId, status, payloadData) => __awai
     let parsedPaymentData;
     try {
         const res = yield (0, PaymentGatway_1.verifyPayment)(transactionId);
+        console.log(res);
         if (!res || res.pay_status !== "Successful") {
             throw new Error("Payment verification failed or was not successful.");
         }

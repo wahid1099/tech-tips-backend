@@ -5,29 +5,34 @@ import config from "../config/index";
 export const initiatePayment = async (payload: any) => {
   const payloadData = encodeURIComponent(JSON.stringify(payload));
 
-  const response = await axios.post(config.payment_url!, {
-    store_id: config.store_id,
-    signature_key: config.signature_key,
-    tran_id: payload.transactionId,
-    success_url: `${config.backend_url}/api/v1/payment/confirmation?transactionId=${payload.transactionId}&status=success&payloadData=${payloadData}`,
-    fail_url: `${config.backend_url}/api/v1/payment/confirmation?transactionId=${payload.transactionId}&status=failed`,
-    cancel_url: `${config.client_url}`,
-    amount: payload.price,
-    currency: "BDT",
-    desc: "Merchant Registration Payment",
-    cus_name: payload?.userName,
-    cus_email: payload?.email,
-    cus_add1: payload?.address,
-    cus_add2: payload?.address,
-    cus_city: "Dhaka",
-    cus_state: "Dhaka",
-    cus_postcode: "1206",
-    cus_country: "Bangladesh",
-    cus_phone: "133555666",
-    type: "json",
-  });
+  try {
+    const response = await axios.post(config.payment_url!, {
+      store_id: config.store_id,
+      signature_key: config.signature_key,
+      tran_id: payload.transactionId,
+      success_url: `${config.backend_url}/api/v1/payment/confirmation?transactionId=${payload.transactionId}&status=success&payloadData=${payloadData}`,
+      fail_url: `${config.backend_url}/api/v1/payment/confirmation?transactionId=${payload.transactionId}&status=failed`,
+      cancel_url: `${config.client_url}`,
+      amount: payload.price,
+      currency: "BDT",
+      desc: "Merchant Registration Payment",
+      cus_name: payload?.userName,
+      cus_email: payload?.email,
+      cus_add1: payload?.address,
+      cus_add2: payload?.address,
+      cus_city: "Dhaka",
+      cus_state: "Dhaka",
+      cus_postcode: "1206",
+      cus_country: "Bangladesh",
+      cus_phone: "133555666",
+      type: "json",
+    });
 
-  return response.data;
+    return response.data;
+  } catch (error) {
+    console.error("Error initiating payment:", error);
+    throw new Error("Payment initiation failed!");
+  }
 };
 
 export const verifyPayment = async (tnxId: string | undefined) => {
@@ -42,7 +47,11 @@ export const verifyPayment = async (tnxId: string | undefined) => {
     });
 
     return response.data;
-  } catch (err) {
+  } catch (err: any) {
+    console.error(
+      "Error verifying payment:",
+      err.response ? err.response.data : err.message
+    );
     throw new Error("Payment validation failed!");
   }
 };
