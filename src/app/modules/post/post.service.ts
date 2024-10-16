@@ -16,34 +16,47 @@ const getAllPostsFromDB = async (
   page = 1,
   limit = 10
 ) => {
-  const skip = (page - 1) * limit;
+  // Ensure page and limit are valid numbers
+  const pageNumber = Math.max(1, Number(page) || 1); // Default to 1 if NaN
+  const limitNumber = Math.max(1, Number(limit) || 10); // Default to 10 if NaN
+  const skip = (pageNumber - 1) * limitNumber;
 
   const query: QueryParams = {}; // Use the interface
 
+  // Case-insensitive search
   if (searchQuery) {
-    query.title = { $regex: searchQuery, $options: "i" }; // Case-insensitive search
+    query.title = { $regex: searchQuery, $options: "i" };
   }
 
+  // Clean up category input to avoid issues with quotes
   if (category) {
-    query.category = category;
+    query.category = category.replace(/['"]/g, "").trim();
   }
 
-  const posts = await Post.find(query)
-    .populate("author")
-    .populate("comments.user")
-    .sort("-createdAt")
-    .skip(skip)
-    .limit(limit);
+  console.log("Query Parameters:", query); // Log the query for debugging
 
-  const totalPosts = await Post.countDocuments(query); // Total number of posts
+  try {
+    // Fetch posts from the database
+    const posts = await Post.find(query)
+      .populate("author")
+      .populate("comments.user")
+      .sort("-createdAt")
+      .skip(skip)
+      .limit(limitNumber);
 
-  return {
-    posts,
-    totalPosts,
-    totalPages: Math.ceil(totalPosts / limit),
-    currentPage: page,
-    hasMore: page * limit < totalPosts, // Check if there are more posts
-  };
+    const totalPosts = await Post.countDocuments(query); // Total number of posts
+
+    return {
+      posts,
+      totalPosts,
+      totalPages: Math.ceil(totalPosts / limitNumber),
+      currentPage: pageNumber,
+      hasMore: pageNumber * limitNumber < totalPosts, // Check if there are more posts
+    };
+  } catch (error) {
+    console.error("Error fetching posts:", error); // Log any errors
+    throw new Error("Could not fetch posts"); // Handle errors appropriately
+  }
 };
 
 const getSinglePostFromDB = async (postId: string) => {

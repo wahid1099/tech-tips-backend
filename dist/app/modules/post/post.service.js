@@ -19,28 +19,41 @@ const post_models_1 = __importDefault(require("./post.models"));
 const user_model_1 = require("../user/user.model");
 const mongoose_1 = require("mongoose");
 const getAllPostsFromDB = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (searchQuery = "", category = "", page = 1, limit = 10) {
-    const skip = (page - 1) * limit;
+    // Ensure page and limit are valid numbers
+    const pageNumber = Math.max(1, Number(page) || 1); // Default to 1 if NaN
+    const limitNumber = Math.max(1, Number(limit) || 10); // Default to 10 if NaN
+    const skip = (pageNumber - 1) * limitNumber;
     const query = {}; // Use the interface
+    // Case-insensitive search
     if (searchQuery) {
-        query.title = { $regex: searchQuery, $options: "i" }; // Case-insensitive search
+        query.title = { $regex: searchQuery, $options: "i" };
     }
+    // Clean up category input to avoid issues with quotes
     if (category) {
-        query.category = category;
+        query.category = category.replace(/['"]/g, "").trim();
     }
-    const posts = yield post_models_1.default.find(query)
-        .populate("author")
-        .populate("comments.user")
-        .sort("-createdAt")
-        .skip(skip)
-        .limit(limit);
-    const totalPosts = yield post_models_1.default.countDocuments(query); // Total number of posts
-    return {
-        posts,
-        totalPosts,
-        totalPages: Math.ceil(totalPosts / limit),
-        currentPage: page,
-        hasMore: page * limit < totalPosts, // Check if there are more posts
-    };
+    console.log("Query Parameters:", query); // Log the query for debugging
+    try {
+        // Fetch posts from the database
+        const posts = yield post_models_1.default.find(query)
+            .populate("author")
+            .populate("comments.user")
+            .sort("-createdAt")
+            .skip(skip)
+            .limit(limitNumber);
+        const totalPosts = yield post_models_1.default.countDocuments(query); // Total number of posts
+        return {
+            posts,
+            totalPosts,
+            totalPages: Math.ceil(totalPosts / limitNumber),
+            currentPage: pageNumber,
+            hasMore: pageNumber * limitNumber < totalPosts, // Check if there are more posts
+        };
+    }
+    catch (error) {
+        console.error("Error fetching posts:", error); // Log any errors
+        throw new Error("Could not fetch posts"); // Handle errors appropriately
+    }
 });
 const getSinglePostFromDB = (postId) => __awaiter(void 0, void 0, void 0, function* () {
     const post = yield post_models_1.default.findById(postId)
