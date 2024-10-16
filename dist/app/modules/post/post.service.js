@@ -30,7 +30,7 @@ const getAllPostsFromDB = (...args_1) => __awaiter(void 0, [...args_1], void 0, 
     }
     // Clean up category input to avoid issues with quotes
     if (category) {
-        query.category = category.replace(/['"]/g, "").trim();
+        query.category = category.replace(/['"]+/g, "").trim(); // Remove both single and double quotes
     }
     console.log("Query Parameters:", query); // Log the query for debugging
     try {
