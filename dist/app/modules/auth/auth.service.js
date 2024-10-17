@@ -127,7 +127,7 @@ const forgetPassword = (email) => __awaiter(void 0, void 0, void 0, function* ()
     };
     const resetToken = (0, auth_constant_1.createToken)(jwtPayload, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);
     const resetUILink = `${config_1.default.reset_pass_ui_link}?eamil=${user.email}&token=${resetToken} `;
-    (0, sendMail_1.sendEmail)(user.email, resetUILink);
+    yield (0, sendMail_1.sendEmail)(user.email, resetUILink);
 });
 const toggoleUserRole = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.findById(userId);
