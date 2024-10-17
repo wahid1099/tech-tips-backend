@@ -19,8 +19,8 @@ const sendEmail = (to, html) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const transporter = nodemailer_1.default.createTransport({
             host: "smtp.gmail.com",
-            port: 587,
-            secure: config_1.default.node_dev === "production",
+            port: 465,
+            secure: true,
             auth: {
                 user: config_1.default.user_email,
                 pass: config_1.default.user_pass,
