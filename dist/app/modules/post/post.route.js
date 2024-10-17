@@ -23,4 +23,7 @@ router.post("/post-comment/:postId", (0, auth_1.default)(user_constant_1.USER_RO
 router.delete("/delete-comment/:postId/:commentId", (0, auth_1.default)(user_constant_1.USER_ROLE.user, user_constant_1.USER_ROLE.admin), post_controller_1.PostControllers.commentDeletFromDB);
 router.put("/update-comment/:postId/:commentId", (0, auth_1.default)(user_constant_1.USER_ROLE.user, user_constant_1.USER_ROLE.admin), post_controller_1.PostControllers.updateCommentFromDB);
 router.put("/:postId/vote", (0, auth_1.default)(user_constant_1.USER_ROLE.user, user_constant_1.USER_ROLE.admin), post_controller_1.PostControllers.votePost);
+// router.get('/', PostControllers.getAllPostsFromDB)
+router.get("/most-liked", post_controller_1.PostControllers.getMostLikedPostsFromDB);
+router.get("/lowest-liked", post_controller_1.PostControllers.getLowestLikedPostsFromDB);
 exports.PostRoutes = router;

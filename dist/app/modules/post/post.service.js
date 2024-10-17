@@ -32,7 +32,7 @@ const getAllPostsFromDB = (...args_1) => __awaiter(void 0, [...args_1], void 0, 
     if (category) {
         query.category = category.replace(/['"]+/g, "").trim(); // Remove both single and double quotes
     }
-    console.log("Query Parameters:", query); // Log the query for debugging
+    // console.log("Query Parameters:", query); // Log the query for debugging
     try {
         // Fetch posts from the database
         const posts = yield post_models_1.default.find(query)
@@ -183,6 +183,49 @@ const myPostsIntoDB = (email) => __awaiter(void 0, void 0, void 0, function* () 
     }
     return result;
 });
+const getMostLikedPosts = () => __awaiter(void 0, void 0, void 0, function* () {
+    const posts = yield post_models_1.default.find()
+        .populate("author")
+        .populate("comments.user")
+        .populate("upVotes")
+        .populate("downVotes")
+        .sort("-createdAt");
+    const sortedPosts = posts.sort((a, b) => { var _a, _b; return ((_a = b === null || b === void 0 ? void 0 : b.upVotes) === null || _a === void 0 ? void 0 : _a.length) - ((_b = a === null || a === void 0 ? void 0 : a.upVotes) === null || _b === void 0 ? void 0 : _b.length); });
+    const mostLikedPosts = sortedPosts.slice(0, 6);
+    return { mostLikedPosts };
+});
+const getLowestLikedPosts = (_a) => __awaiter(void 0, [_a], void 0, function* ({ searchQuery = "", category = "" }) {
+    const query = {};
+    // Filter by category if provided
+    if (category) {
+        query.category = category;
+    }
+    const posts = yield post_models_1.default.find(query)
+        .populate("author")
+        .populate("comments.user")
+        .populate("upVotes")
+        .populate("downVotes")
+        .sort("-createdAt");
+    const sortedPosts = posts.sort((a, b) => { var _a, _b; return ((_a = b === null || b === void 0 ? void 0 : b.upVotes) === null || _a === void 0 ? void 0 : _a.length) - ((_b = a === null || a === void 0 ? void 0 : a.upVotes) === null || _b === void 0 ? void 0 : _b.length); });
+    // Check if there are enough posts before slicing
+    let lowestLikedPosts = [];
+    if (sortedPosts.length > 6) {
+        lowestLikedPosts = sortedPosts.slice(6);
+    }
+    else {
+        lowestLikedPosts = sortedPosts;
+    }
+    // Apply search query if provided
+    if (searchQuery) {
+        const queryLowerCase = searchQuery.toLowerCase();
+        lowestLikedPosts = lowestLikedPosts.filter((post) => {
+            var _a, _b;
+            return ((_a = post === null || post === void 0 ? void 0 : post.title) === null || _a === void 0 ? void 0 : _a.toLowerCase().includes(queryLowerCase)) ||
+                ((_b = post === null || post === void 0 ? void 0 : post.description) === null || _b === void 0 ? void 0 : _b.toLowerCase().includes(queryLowerCase));
+        });
+    }
+    return { lowestLikedPosts };
+});
 exports.PostServices = {
     createPostIntoDB,
     getAllPostsFromDB,
@@ -194,4 +237,6 @@ exports.PostServices = {
     commentsUpdateIntoDB,
     votePostIntoDB,
     myPostsIntoDB,
+    getMostLikedPosts,
+    getLowestLikedPosts,
 };

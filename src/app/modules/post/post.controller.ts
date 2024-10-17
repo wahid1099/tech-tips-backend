@@ -140,6 +140,33 @@ const myPosts = catchAsync(async (req, res) => {
   });
 });
 
+const getLowestLikedPostsFromDB = catchAsync(async (req, res) => {
+  const { searchQuery, category } = req.query;
+
+  const result = await PostServices.getLowestLikedPosts({
+    searchQuery: typeof searchQuery === "string" ? searchQuery : "",
+    category: typeof category === "string" ? category : "",
+  });
+
+  sendResponse(res, {
+    success: true,
+    message: "Lowest liked posts fetched successfully",
+    statusCode: httpStatus.OK,
+    data: result,
+  });
+});
+
+const getMostLikedPostsFromDB = catchAsync(async (req, res) => {
+  const result = await PostServices.getMostLikedPosts();
+
+  sendResponse(res, {
+    success: true,
+    message: "Most liked posts fetched successfully",
+    statusCode: httpStatus.OK,
+    data: result,
+  });
+});
+
 export const PostControllers = {
   createPostFromDB,
   getAllPostsFromDB,
@@ -151,4 +178,6 @@ export const PostControllers = {
   updateCommentFromDB,
   votePost,
   myPosts,
+  getLowestLikedPostsFromDB,
+  getMostLikedPostsFromDB,
 };

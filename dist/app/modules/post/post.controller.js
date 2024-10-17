@@ -133,6 +133,28 @@ const myPosts = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0
         data: result,
     });
 }));
+const getLowestLikedPostsFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { searchQuery, category } = req.query;
+    const result = yield post_service_1.PostServices.getLowestLikedPosts({
+        searchQuery: typeof searchQuery === "string" ? searchQuery : "",
+        category: typeof category === "string" ? category : "",
+    });
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        message: "Lowest liked posts fetched successfully",
+        statusCode: http_status_1.default.OK,
+        data: result,
+    });
+}));
+const getMostLikedPostsFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield post_service_1.PostServices.getMostLikedPosts();
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        message: "Most liked posts fetched successfully",
+        statusCode: http_status_1.default.OK,
+        data: result,
+    });
+}));
 exports.PostControllers = {
     createPostFromDB,
     getAllPostsFromDB,
@@ -144,4 +166,6 @@ exports.PostControllers = {
     updateCommentFromDB,
     votePost,
     myPosts,
+    getLowestLikedPostsFromDB,
+    getMostLikedPostsFromDB,
 };

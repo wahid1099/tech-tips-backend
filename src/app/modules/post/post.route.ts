@@ -64,4 +64,8 @@ router.put(
   PostControllers.votePost
 );
 
+// router.get('/', PostControllers.getAllPostsFromDB)
+router.get("/most-liked", PostControllers.getMostLikedPostsFromDB);
+router.get("/lowest-liked", PostControllers.getLowestLikedPostsFromDB);
+
 export const PostRoutes = router;

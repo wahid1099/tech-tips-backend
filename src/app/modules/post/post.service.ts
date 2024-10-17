@@ -225,6 +225,61 @@ const myPostsIntoDB = async (email: string) => {
   }
   return result;
 };
+
+const getMostLikedPosts = async () => {
+  const posts = await Post.find()
+    .populate("author")
+    .populate("comments.user")
+    .populate("upVotes")
+    .populate("downVotes")
+    .sort("-createdAt");
+
+  const sortedPosts = posts.sort(
+    (a, b) => b?.upVotes?.length - a?.upVotes?.length
+  );
+  const mostLikedPosts = sortedPosts.slice(0, 6);
+
+  return { mostLikedPosts };
+};
+
+const getLowestLikedPosts = async ({ searchQuery = "", category = "" }) => {
+  const query: any = {};
+
+  // Filter by category if provided
+  if (category) {
+    query.category = category;
+  }
+
+  const posts = await Post.find(query)
+    .populate("author")
+    .populate("comments.user")
+    .populate("upVotes")
+    .populate("downVotes")
+    .sort("-createdAt");
+
+  const sortedPosts = posts.sort(
+    (a, b) => b?.upVotes?.length - a?.upVotes?.length
+  );
+
+  // Check if there are enough posts before slicing
+  let lowestLikedPosts = [];
+  if (sortedPosts.length > 6) {
+    lowestLikedPosts = sortedPosts.slice(6);
+  } else {
+    lowestLikedPosts = sortedPosts;
+  }
+
+  // Apply search query if provided
+  if (searchQuery) {
+    const queryLowerCase = searchQuery.toLowerCase();
+    lowestLikedPosts = lowestLikedPosts.filter(
+      (post) =>
+        (post?.title as string)?.toLowerCase().includes(queryLowerCase) ||
+        (post?.description as string)?.toLowerCase().includes(queryLowerCase)
+    );
+  }
+  return { lowestLikedPosts };
+};
 export const PostServices = {
   createPostIntoDB,
   getAllPostsFromDB,
@@ -236,4 +291,6 @@ export const PostServices = {
   commentsUpdateIntoDB,
   votePostIntoDB,
   myPostsIntoDB,
+  getMostLikedPosts,
+  getLowestLikedPosts,
 };
