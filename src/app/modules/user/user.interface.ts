@@ -17,6 +17,7 @@ export type TUser = {
   following: mongoose.Types.ObjectId[];
   payments: mongoose.Types.ObjectId[];
   passwordChangedAt: Date;
+  status?: "active" | "block";
   bio: string;
   address?: string;
   isDeleted: boolean;

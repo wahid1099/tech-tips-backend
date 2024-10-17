@@ -41,6 +41,18 @@ const refreshToken = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+const toggoleUserRoleFromDB = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const result = await AuthService.toggoleUserRole(userId);
+  sendResponse(res, {
+    success: true,
+    message: "User role toggled successfully",
+    statusCode: httpStatus.OK,
+    data: result,
+  });
+});
+
 const forgetPasswordFromDB = catchAsync(async (req, res) => {
   const { email } = req.body;
   const result = await AuthService.forgetPassword(email);
@@ -51,9 +63,11 @@ const forgetPasswordFromDB = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 export const AuthController = {
   createLoginUserIntoDB,
   createChangePasswordIntoDB,
   refreshToken,
   forgetPasswordFromDB,
+  toggoleUserRoleFromDB,
 };

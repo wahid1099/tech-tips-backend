@@ -18,6 +18,7 @@ const AppError_1 = __importDefault(require("../../error/AppError"));
 const user_model_1 = require("../user/user.model");
 const auth_constant_1 = require("./auth.constant");
 const config_1 = __importDefault(require("../../config"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const sendMail_1 = require("../../utils/sendMail");
 const createLoginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
@@ -128,9 +129,56 @@ const forgetPassword = (email) => __awaiter(void 0, void 0, void 0, function* ()
     const resetUILink = `${config_1.default.reset_pass_ui_link}?eamil=${user.email}&token=${resetToken} `;
     (0, sendMail_1.sendEmail)(user.email, resetUILink);
 });
+const toggoleUserRole = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_model_1.User.findById(userId);
+    if (!user) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found");
+    }
+    if (user.isDeleted) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User already deleted");
+    }
+    if (user.status === "block") {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User is blocked");
+    }
+    const updateRole = user.role === "user" ? "admin" : "user";
+    const updateUserRole = yield user_model_1.User.findByIdAndUpdate(userId, { role: updateRole }, { new: true });
+    return updateUserRole;
+});
+const resetPassword = (payload, token) => __awaiter(void 0, void 0, void 0, function* () {
+    //checking if the user is exists
+    const user = yield user_model_1.User.isUserExists(payload === null || payload === void 0 ? void 0 : payload.email);
+    if (!user) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not Found!!");
+    }
+    // checking if the user is deleted
+    const isDeleted = user.isDeleted;
+    if (isDeleted) {
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is already deleted!!");
+    }
+    // checking if the user is blocked
+    const userStatus = user === null || user === void 0 ? void 0 : user.status;
+    if (userStatus === "block") {
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is already blocked!!");
+    }
+    const decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret);
+    if (payload.email !== decoded.userId) {
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "You ar forbidden!!");
+    }
+    // hash new password
+    const newHashedPassword = yield bcrypt_1.default.hash(payload.newPassword, Number(config_1.default.bcrypt_salt_rounds));
+    yield user_model_1.User.findOneAndUpdate({
+        id: decoded.userId,
+        role: decoded.role,
+    }, {
+        password: newHashedPassword,
+        passwordChangesAt: new Date(),
+    });
+});
 exports.AuthService = {
     createLoginUser,
     createChangePassword,
     createRefreshToken,
     forgetPassword,
+    toggoleUserRole,
+    resetPassword,
 };
