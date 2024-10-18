@@ -86,14 +86,12 @@ const forgetPasswordFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(v
 }));
 const resetPasswordFromDb = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const { newPassword, email } = req.body; // Extracting email and newPassword from the request body
-    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1]; // Extract the token from the Authorization header
+    const { newPassword, email } = req.body;
+    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
     if (!token) {
         throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "Authorization token is missing");
     }
-    // Call the AuthService to handle the password reset logic
     const result = yield auth_service_1.AuthService.resetPassword({ email, newPassword }, token);
-    // Send the response back
     (0, sendResponse_1.default)(res, {
         success: true,
         message: "Password reset successfully",

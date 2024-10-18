@@ -66,8 +66,8 @@ const forgetPasswordFromDB = catchAsync(async (req, res) => {
 });
 
 const resetPasswordFromDb = catchAsync(async (req, res) => {
-  const { newPassword, email } = req.body; // Extracting email and newPassword from the request body
-  const token = req.headers.authorization?.split(" ")[1]; // Extract the token from the Authorization header
+  const { newPassword, email } = req.body;
+  const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
     throw new AppError(
@@ -76,10 +76,8 @@ const resetPasswordFromDb = catchAsync(async (req, res) => {
     );
   }
 
-  // Call the AuthService to handle the password reset logic
   const result = await AuthService.resetPassword({ email, newPassword }, token);
 
-  // Send the response back
   sendResponse(res, {
     success: true,
     message: "Password reset successfully",

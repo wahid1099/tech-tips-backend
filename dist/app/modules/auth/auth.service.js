@@ -109,26 +109,29 @@ const createRefreshToken = (token) => __awaiter(void 0, void 0, void 0, function
     return { accessToken };
 });
 const forgetPassword = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    // checking if the user is exist
+    // Check if the user exists
     const user = yield user_model_1.User.findOne({ email });
     if (!user) {
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "This user is not found !");
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "This user is not found!");
     }
-    // checking if the user is already deleted
-    const isDeleted = user === null || user === void 0 ? void 0 : user.isDeleted;
-    if (isDeleted) {
-        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is deleted !");
+    // Check if the user is already deleted
+    if (user.isDeleted) {
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is deleted!");
     }
+    // Create JWT payload
     const jwtPayload = {
-        id: user === null || user === void 0 ? void 0 : user._id,
+        id: user._id.toString(), // Change userId to id for consistency
         email: user.email,
         role: user.role,
         profileImage: user.profileImage,
         type: "password_reset",
     };
-    const resetToken = (0, auth_constant_1.createToken)(jwtPayload, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);
+    // Generate the reset token
+    const resetToken = (0, auth_constant_1.createToken)(jwtPayload, config_1.default.jwt_access_secret, "5m");
+    // Construct the reset password link
     const reset_pass_ui_link = "https://techtipshubwahid.netlify.app/reset-password";
     const resetUILink = `${reset_pass_ui_link}?email=${user.email}&token=${resetToken}`;
+    // Send the email with the reset link
     yield (0, sendMail_1.sendEmail)(user.email, resetUILink);
 });
 const toggoleUserRole = (userId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -148,17 +151,17 @@ const toggoleUserRole = (userId) => __awaiter(void 0, void 0, void 0, function* 
 });
 const resetPassword = (payload, token) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the user exists
-    const user = yield user_model_1.User.isUserExists(payload === null || payload === void 0 ? void 0 : payload.email);
+    const user = yield user_model_1.User.isUserExists(payload.email);
     if (!user) {
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found!!");
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found!");
     }
     // Check if the user is deleted
     if (user.isDeleted) {
-        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is already deleted!!");
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is already deleted!");
     }
     // Check if the user is blocked
-    if ((user === null || user === void 0 ? void 0 : user.status) === "block") {
-        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is blocked!!");
+    if (user.status === "block") {
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is blocked!");
     }
     // Verify the token
     let decoded;
@@ -169,17 +172,16 @@ const resetPassword = (payload, token) => __awaiter(void 0, void 0, void 0, func
         throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "Invalid or expired token!");
     }
     // Ensure that the token's payload matches the user's ID
-    if (user._id.toString() !== decoded.userId) {
-        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "You are forbidden!!");
+    if (user._id.toString() !== decoded.id) {
+        // Make sure to match the key here
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "You are forbidden!");
     }
     // Hash the new password
     const newHashedPassword = yield bcrypt_1.default.hash(payload.newPassword, Number(config_1.default.bcrypt_salt_rounds));
     // Update the user's password
-    const updatedUser = yield user_model_1.User.findOneAndUpdate({ _id: user._id }, {
-        password: newHashedPassword,
-    }, { new: true } // This option returns the updated user object
+    const updatedUser = yield user_model_1.User.findOneAndUpdate({ _id: user._id }, { password: newHashedPassword }, { new: true } // Return the updated user object
     );
-    return updatedUser;
+    return updatedUser; // Return updated user object
 });
 exports.AuthService = {
     createLoginUser,
