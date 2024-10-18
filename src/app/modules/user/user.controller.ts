@@ -60,6 +60,47 @@ const deleteUserFromDB = catchAsync(async (req, res) => {
   });
 });
 
+const toggleFollowFromDB = catchAsync(async (req, res) => {
+  const followingId = req.params.id;
+
+  const followerId = req.user.userId; // Use the ID extracted from JWT
+
+  const result = await UserServices.toggleFollowUserIntoDB(
+    followingId,
+    followerId
+  );
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Follow Action Successfully",
+    data: result,
+  });
+});
+
+const userManageStatusFromDB = catchAsync(async (req, res) => {
+  const id = req.params.id;
+
+  const action: "unblock" | "block" = req.query.action as "unblock" | "block";
+
+  const result = await UserServices.userManageStatus(id, action);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User status updated successfully",
+    data: result,
+  });
+});
+
+const getUserFollowersAndFollowingFRomDb = catchAsync(async (req, res) => {
+  const id = req.user.userId;
+  const result = await UserServices.getUserFollowersAndFollowing(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User followers and following fetched successfully",
+    data: result,
+  });
+});
 export const UserControllers = {
   createUserFromDB,
   getSingleUserFromDB,
@@ -67,4 +108,7 @@ export const UserControllers = {
   updateUserFromDB,
   deleteUserFromDB,
   getMe,
+  toggleFollowFromDB,
+  userManageStatusFromDB,
+  getUserFollowersAndFollowingFRomDb,
 };
