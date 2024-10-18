@@ -15,5 +15,6 @@ router.post("/sign-in", (0, validateRequest_1.default)(user_validation_1.loginVa
 router.post("/change-password", (0, auth_1.default)(user_constant_1.USER_ROLE.admin, user_constant_1.USER_ROLE.user), auth_controller_1.AuthController.createChangePasswordIntoDB);
 router.post("/refresh-token", (0, auth_1.default)(user_constant_1.USER_ROLE.user, user_constant_1.USER_ROLE.admin), (0, validateRequest_1.default)(user_validation_1.refreshTokenValidationSchema), auth_controller_1.AuthController.refreshToken);
 router.post("/forget-password", auth_controller_1.AuthController.forgetPasswordFromDB);
+router.post("/reset-password", auth_controller_1.AuthController.resetPasswordFromDb);
 router.put("/toggole-user-role/:userId", (0, auth_1.default)(user_constant_1.USER_ROLE.admin), auth_controller_1.AuthController.toggoleUserRoleFromDB);
 exports.AuthRoutes = router;

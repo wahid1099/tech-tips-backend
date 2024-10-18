@@ -124,9 +124,11 @@ const forgetPassword = (email) => __awaiter(void 0, void 0, void 0, function* ()
         email: user.email,
         role: user.role,
         profileImage: user.profileImage,
+        type: "password_reset",
     };
     const resetToken = (0, auth_constant_1.createToken)(jwtPayload, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);
-    const resetUILink = `${config_1.default.reset_pass_ui_link}?eamil=${user.email}&token=${resetToken} `;
+    const reset_pass_ui_link = "https://techtipshubwahid.netlify.app/reset-password";
+    const resetUILink = `${reset_pass_ui_link}?email=${user.email}&token=${resetToken}`;
     yield (0, sendMail_1.sendEmail)(user.email, resetUILink);
 });
 const toggoleUserRole = (userId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -145,34 +147,39 @@ const toggoleUserRole = (userId) => __awaiter(void 0, void 0, void 0, function* 
     return updateUserRole;
 });
 const resetPassword = (payload, token) => __awaiter(void 0, void 0, void 0, function* () {
-    //checking if the user is exists
+    // Check if the user exists
     const user = yield user_model_1.User.isUserExists(payload === null || payload === void 0 ? void 0 : payload.email);
     if (!user) {
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not Found!!");
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found!!");
     }
-    // checking if the user is deleted
-    const isDeleted = user.isDeleted;
-    if (isDeleted) {
+    // Check if the user is deleted
+    if (user.isDeleted) {
         throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is already deleted!!");
     }
-    // checking if the user is blocked
-    const userStatus = user === null || user === void 0 ? void 0 : user.status;
-    if (userStatus === "block") {
-        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is already blocked!!");
+    // Check if the user is blocked
+    if ((user === null || user === void 0 ? void 0 : user.status) === "block") {
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is blocked!!");
     }
-    const decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret);
-    if (payload.email !== decoded.userId) {
-        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "You ar forbidden!!");
+    // Verify the token
+    let decoded;
+    try {
+        decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret);
     }
-    // hash new password
+    catch (err) {
+        throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "Invalid or expired token!");
+    }
+    // Ensure that the token's payload matches the user's ID
+    if (user._id.toString() !== decoded.userId) {
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "You are forbidden!!");
+    }
+    // Hash the new password
     const newHashedPassword = yield bcrypt_1.default.hash(payload.newPassword, Number(config_1.default.bcrypt_salt_rounds));
-    yield user_model_1.User.findOneAndUpdate({
-        id: decoded.userId,
-        role: decoded.role,
-    }, {
+    // Update the user's password
+    const updatedUser = yield user_model_1.User.findOneAndUpdate({ _id: user._id }, {
         password: newHashedPassword,
-        passwordChangesAt: new Date(),
-    });
+    }, { new: true } // This option returns the updated user object
+    );
+    return updatedUser;
 });
 exports.AuthService = {
     createLoginUser,

@@ -29,6 +29,7 @@ const config_1 = __importDefault(require("../../config"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const auth_service_1 = require("./auth.service");
+const AppError_1 = __importDefault(require("../../error/AppError"));
 const createLoginUserIntoDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield auth_service_1.AuthService.createLoginUser(req.body);
     const { accessToken, refreshToken } = result;
@@ -83,10 +84,28 @@ const forgetPasswordFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(v
         data: result,
     });
 }));
+const resetPasswordFromDb = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const { newPassword, email } = req.body; // Extracting email and newPassword from the request body
+    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1]; // Extract the token from the Authorization header
+    if (!token) {
+        throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "Authorization token is missing");
+    }
+    // Call the AuthService to handle the password reset logic
+    const result = yield auth_service_1.AuthService.resetPassword({ email, newPassword }, token);
+    // Send the response back
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        message: "Password reset successfully",
+        statusCode: http_status_1.default.OK,
+        data: result,
+    });
+}));
 exports.AuthController = {
     createLoginUserIntoDB,
     createChangePasswordIntoDB,
     refreshToken,
     forgetPasswordFromDB,
     toggoleUserRoleFromDB,
+    resetPasswordFromDb,
 };

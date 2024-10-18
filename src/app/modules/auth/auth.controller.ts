@@ -3,6 +3,7 @@ import config from "../../config";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { AuthService } from "./auth.service";
+import AppError from "../../error/AppError";
 
 const createLoginUserIntoDB = catchAsync(async (req, res) => {
   const result = await AuthService.createLoginUser(req.body);
@@ -64,10 +65,34 @@ const forgetPasswordFromDB = catchAsync(async (req, res) => {
   });
 });
 
+const resetPasswordFromDb = catchAsync(async (req, res) => {
+  const { newPassword, email } = req.body; // Extracting email and newPassword from the request body
+  const token = req.headers.authorization?.split(" ")[1]; // Extract the token from the Authorization header
+
+  if (!token) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Authorization token is missing"
+    );
+  }
+
+  // Call the AuthService to handle the password reset logic
+  const result = await AuthService.resetPassword({ email, newPassword }, token);
+
+  // Send the response back
+  sendResponse(res, {
+    success: true,
+    message: "Password reset successfully",
+    statusCode: httpStatus.OK,
+    data: result,
+  });
+});
+
 export const AuthController = {
   createLoginUserIntoDB,
   createChangePasswordIntoDB,
   refreshToken,
   forgetPasswordFromDB,
   toggoleUserRoleFromDB,
+  resetPasswordFromDb,
 };
