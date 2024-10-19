@@ -55,7 +55,7 @@ const userSchema = new mongoose_1.Schema({
     },
     profession: { type: String, default: null },
     userName: { type: String, unique: true },
-    password: { type: String, required: true, select: 0 },
+    password: { type: String, required: true, select: false }, // Exclude password unless explicitly selected
     role: { type: String, enum: ["user", "admin"], default: "user" },
     gender: { type: String, enum: ["male", "female"], required: true },
     birthDate: { type: Date, required: true },
@@ -64,6 +64,11 @@ const userSchema = new mongoose_1.Schema({
     followers: [{ type: mongoose_1.default.Types.ObjectId, ref: "User", default: [] }],
     following: [{ type: mongoose_1.default.Types.ObjectId, ref: "User", default: [] }],
     payments: [{ type: mongoose_1.default.Types.ObjectId, ref: "Payment", default: [] }],
+    status: {
+        type: String,
+        enum: ["active", "block"],
+        default: "active",
+    },
     bio: { type: String, default: "", trim: true },
     address: { type: String, default: null },
     isDeleted: { type: Boolean, default: false },
@@ -71,10 +76,14 @@ const userSchema = new mongoose_1.Schema({
     timestamps: true,
     virtuals: true,
 });
+// Hash password before saving the user document
 userSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         const user = this;
-        //if user name is empty
+        // Only hash the password if it's new or changed
+        if (!user.isModified("password")) {
+            return next();
+        }
         if (!user.userName && user.email) {
             const emailParts = user.email.split("@");
             user.userName = emailParts[0];
@@ -89,31 +98,28 @@ userSchema.post("save", function (doc, next) {
         next();
     });
 });
+// Static method to check if the user exists by email
 userSchema.statics.isUserExists = function (email) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield exports.User.findOne({ email }).select("+password");
     });
 };
+// Static method to check if the password matches
 userSchema.statics.isPasswordMatched = function (plainTextPassword, hashedPassword) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield bcrypt_1.default.compare(plainTextPassword, hashedPassword);
     });
 };
+// Check if the JWT was issued before the password change
 userSchema.statics.isJwtIssuedBeforePasswordChanged = function (passwordChangedTimestamp, jwtIssuedTimestamp) {
     const passwordChangedTime = new Date(passwordChangedTimestamp).getTime() / 1000;
     return passwordChangedTime > jwtIssuedTimestamp;
 };
+// Remove password from JSON response
 userSchema.set("toJSON", {
     transform: function (doc, ret) {
         delete ret.password;
         return ret;
     },
 });
-// Static method to check if a user exists by
-userSchema.statics.isUserExistByEmail = function (email) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield this.findOne({ email });
-    });
-};
-//static mathod to check if the password matches
 exports.User = (0, mongoose_1.model)("User", userSchema);
