@@ -14,7 +14,7 @@ const router = express_1.default.Router();
 router.get("/get-me", (0, auth_1.default)(user_constant_1.USER_ROLE.admin, user_constant_1.USER_ROLE.user), user_controller_1.UserControllers.getMe);
 router.post("/create-user", (0, validateRequest_1.default)(user_validation_1.createUserSchema), user_controller_1.UserControllers.createUserFromDB);
 router.get("/get-single-user/:id", user_controller_1.UserControllers.getSingleUserFromDB);
-router.get("/", (0, auth_1.default)(user_constant_1.USER_ROLE.user), user_controller_1.UserControllers.getAllUserFromDB);
+router.get("/", (0, auth_1.default)(user_constant_1.USER_ROLE.admin), user_controller_1.UserControllers.getAllUserFromDB);
 router.put("/update-user/:id", user_controller_1.UserControllers.updateUserFromDB);
 router.put("/toggle-follow/:id", (0, auth_1.default)(user_constant_1.USER_ROLE.user, user_constant_1.USER_ROLE.admin), user_controller_1.UserControllers.toggleFollowFromDB);
 router.put("/manage-status/:id/status", (0, auth_1.default)(user_constant_1.USER_ROLE.admin), user_controller_1.UserControllers.userManageStatusFromDB);

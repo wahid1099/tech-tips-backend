@@ -21,7 +21,7 @@ router.post(
 );
 
 router.get("/get-single-user/:id", UserControllers.getSingleUserFromDB);
-router.get("/", auth(USER_ROLE.user), UserControllers.getAllUserFromDB);
+router.get("/", auth(USER_ROLE.admin), UserControllers.getAllUserFromDB);
 router.put("/update-user/:id", UserControllers.updateUserFromDB);
 router.put(
   "/toggle-follow/:id",
